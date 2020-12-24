@@ -64,6 +64,36 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 				frameElement.load(document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form)))
 		}
 	})
+const allowedOrigins = [
+        'https://example.com',
+        'https://app.example.com',
+        'http://localhost:8000',
+        'http://localhost:4200'
+      ];
+
+      window.onmessage = (e) => {
+        if (!allowedOrigins.includes(e.origin)) {
+            return;
+        }
+        const payload = JSON.parse(e.data);
+        switch(payload.method) {
+          case 'set':
+            localStorage.setItem(payload.key, JSON.stringify(payload.data));
+            break;
+          case 'get':
+            const parent = window.parent;
+            const data = localStorage.getItem(payload.key);
+            const returnPayload = {
+              method: 'storage#get',
+              data: data
+            }
+            parent.postMessage(JSON.stringify(returnPayload), '*');
+            break;
+          case 'remove':
+            localStorage.removeItem(payload.key);
+            break;
+        }
+      };
 	</script>`)
 		}).catch(e => console.error('Cannot load X-Frame-Bypass:', e))
 	}
