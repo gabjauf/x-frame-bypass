@@ -64,17 +64,8 @@ customElements.define('x-frame-bypass', class extends HTMLIFrameElement {
 				frameElement.load(document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form)))
 		}
 	})
-const allowedOrigins = [
-        'https://example.com',
-        'https://app.example.com',
-        'http://localhost:8000',
-        'http://localhost:4200'
-      ];
 
       window.onmessage = (e) => {
-        if (!allowedOrigins.includes(e.origin)) {
-            return;
-        }
         const payload = JSON.parse(e.data);
         switch(payload.method) {
           case 'set':
